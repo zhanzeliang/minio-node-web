@@ -8,6 +8,7 @@ import type {
   Binary,
 } from './UploadTypes';
 import type { UploadedPart } from 'minio/dist/main/internal/xml-parser';
+import { ConfigService } from '@nestjs/config';
 
 const multiPartBucket = 'public-readonly-file'; // 分片上传的 bucket
 const ONE_DAY = 24 * 60 * 60; // 单位是秒
@@ -30,13 +31,13 @@ class CustomMinioClient extends Minio.Client {
 @Injectable()
 export class MinioUtils {
   minioClient: CustomMinioClient;
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.minioClient = new CustomMinioClient({
-      endPoint: END_POINT,
-      useSSL: false,
-      port: PORT,
-      accessKey: 'admin',
-      secretKey: 'admin123',
+      endPoint: this.configService.get('minio.endPoint'),
+      useSSL: this.configService.get('minio.useSSL'),
+      port: this.configService.get('minio.port'),
+      accessKey: this.configService.get('minio.accessKey'),
+      secretKey: this.configService.get('minio.secretKey'),
     });
 
     this.createBucket();

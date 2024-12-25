@@ -33,11 +33,17 @@ export class AppController {
     return this.appService.initMultiPartUpload(fileUploadInfo);
   }
 
+  /**
+   * 合并分片
+   */
   @Post('multipart/merge/:md5')
   mergeMultiPartUpload(@Param('md5') md5: string) {
     return this.appService.mergeMultiPartUpload(md5);
   }
 
+  /**
+   * 上传分片
+   */
   @Post('multipart/upload')
   @UseInterceptors(FileInterceptor('file'))
   partUpload(
@@ -47,6 +53,9 @@ export class AppController {
     return this.appService.uploadPart(chunkUploadInfo, file.buffer);
   }
 
+  /**
+   *  获取文件列表
+   */
   @Get('list')
   getList() {
     return this.appService.getList();
