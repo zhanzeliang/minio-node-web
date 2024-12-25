@@ -27,8 +27,8 @@ const columns: TableColumnData[] = [
   { title: '原文件名', dataIndex: 'originFileName', ellipsis: true, tooltip: true },
   { title: 'object', dataIndex: 'object', ellipsis: true, tooltip: true },
   { title: '文件大小', dataIndex: 'size', slotName: 'size', width: 120 },
-  { title: '下载进度', dataIndex: 'progress', slotName: 'progress' },
-  { title: '操作', dataIndex: 'status', slotName: 'status', width: 120 }
+  // { title: '下载进度', dataIndex: 'progress', slotName: 'progress' },
+  // { title: '操作', dataIndex: 'status', slotName: 'status', width: 120 }
 ]
 
 // 分片下载文件
@@ -77,9 +77,9 @@ const puaseDownload = (record: FileDataType) => {
     <!-- 文件大小 -->
     <template #size="{ record }">{{ convertFileSizeUnit(record.size) }}</template>
     <!-- 下载进度 -->
-    <template #progress="{ record }">
+    <!-- <template #progress="{ record }">
       <a-progress v-if="record.progress" :percent="record.progress / 100" />
-    </template>
+    </template> -->
     <!-- 操作 -->
     <template #status="{ record }">
       <template v-if="record.status === undefined || record.status === 'error'">
