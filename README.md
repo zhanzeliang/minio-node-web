@@ -42,4 +42,3 @@ minio大文件分片上传、续传、秒传demo
 - ## minio 注意事项
 
 - minio 开启了公共只读策略，所以不需要进行签名访问
-- 如何开启 minio 公共只读策略？**见 service 文件夹（后端）的测试类 `ReactMinioSpringApplicationTests`**
