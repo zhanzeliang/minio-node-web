@@ -9,7 +9,7 @@ minio大文件分片上传、续传、秒传demo
 
 # 分片上传流程
 
-![](./images/multi-part-upload.png)
+![上传流程](./images/multi-part-upload.png)
 
 - 前端计算文件 md5，并发请求查询此文件的状态
 - 若文件已上传，则后端直接返回上传成功，并返回 url 地址
