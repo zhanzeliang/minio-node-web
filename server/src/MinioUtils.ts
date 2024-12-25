@@ -9,9 +9,10 @@ import type {
 } from './UploadTypes';
 import type { UploadedPart } from 'minio/dist/main/internal/xml-parser';
 import { ConfigService } from '@nestjs/config';
+import type { PreSignRequestParams } from 'minio/dist/main/internal/type';
 
 const multiPartBucket = 'public-readonly-file'; // 分片上传的 bucket
-const ONE_DAY = 24 * 60 * 60; // 单位是秒
+const ONE_DAY = 24 * 60 * 60 * 7; // 单位是秒
 const END_POINT = 'localhost';
 const PORT = 9000;
 
@@ -70,13 +71,11 @@ export class MinioUtils {
     }
 
     urlsVo.uploadId = uploadId;
-    const extraParams = { uploadId };
     try {
-      for (let i = 0; i < chunkCount; i++) {
-        const uploadUrl = await this.minioClient.presignedGetObject(
-          multiPartBucket,
+      for (let i = 1; i <= chunkCount; i++) {
+        const extraParams = { uploadId, partNumber: i + '' };
+        const uploadUrl = await this.presignedPutObject(
           objectName,
-          ONE_DAY,
           extraParams,
         );
         urlsVo.urls.push(uploadUrl);
@@ -140,5 +139,15 @@ export class MinioUtils {
 
   getMultiPartBucketName(): string {
     return multiPartBucket;
+  }
+
+  presignedPutObject(objectName: string, respHeaders?: PreSignRequestParams) {
+    return this.minioClient.presignedUrl(
+      'PUT',
+      multiPartBucket,
+      objectName,
+      ONE_DAY,
+      respHeaders,
+    );
   }
 }

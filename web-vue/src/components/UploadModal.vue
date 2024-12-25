@@ -10,6 +10,7 @@ import type { UploadFileInfoType } from '../services/apis/typing'
 import cutFile from '../core/cutFile'
 import { MerkleTree } from '../core/MerkleTree'
 import { reactive } from 'vue'
+import axios from 'axios'
 
 const limit = pLimit(3)
 
@@ -143,7 +144,7 @@ const uploadFile = async (index: number, item: FileTableDataType) => {
 
   // plimit 并发上传
   const uploadLimit = needUploadFile.map((n) =>
-    limit(() => uploadChunkUrl(n, index, totalSize, item.file.type, item.md5))
+    limit(() => uploadChunkUrl(n, index, totalSize, item.file.type))
   )
 
   const results = await Promise.allSettled(uploadLimit)
@@ -215,16 +216,14 @@ const uploadChunkUrl = (
   i: number,
   totalSize: number,
   type: string,
-  fileMd5: string
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
-      uploadPart({
-        partNumber: chunkItem.partNumber,
-        fileMd5: fileMd5,
-        contentType: type,
-      }, chunkItem.file)
+    axios
+      .put(chunkItem.url, chunkItem.file, {
+        headers: { 'Content-Type': type || 'application/octet-stream' }
+      })
       .then((res) => {
-        if ([200, 201].includes(res.code)) {
+        if ([200].includes(res.status)) {
            // 已上传的文件大小更新，上传进度更新
            const newUploaedSize = state.dataSource[i].uploadedSize + chunkItem.file.size
           state.dataSource[i] = {

@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Param,
+  Query,
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
@@ -51,6 +52,14 @@ export class AppController {
     @Body() chunkUploadInfo: ChunkUploadInfoDto,
   ) {
     return this.appService.uploadPart(chunkUploadInfo, file.buffer);
+  }
+
+  @Get('multipart/listParts')
+  listParts(
+    @Query('objectName') objectName: string,
+    @Query('uploadId') uploadId: string,
+  ) {
+    return this.appService.listPart(objectName, uploadId);
   }
 
   /**

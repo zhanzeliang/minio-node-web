@@ -110,6 +110,9 @@ export class AppService {
     return uploadUrlsVO;
   }
 
+  /**
+   * 上传分片（暂时不用，已进改成直接上传至minio）
+   */
   async uploadPart(
     chunkUploadInfo: ChunkUploadInfoDto,
     file: Binary,
@@ -129,11 +132,6 @@ export class AppService {
       },
       file,
     );
-    await this.redisClient.hSet(
-      chunkUploadInfo.fileMd5,
-      'part' + chunkUploadInfo.partNumber,
-      JSON.stringify(eTag),
-    );
     return eTag;
   }
 
@@ -142,14 +140,13 @@ export class AppService {
     const fileUploadInfo: FileUploadInfo = result
       ? JSON.parse(result[REDIS_UPLOAD_FILE_INFO_FIELD])
       : null;
-    const eTags: ETag[] = [];
-    for (const props in result) {
-      if (/^part\d+$/.test(props)) {
-        eTags.push(JSON.parse(result[props]));
-      }
-    }
+    let eTags = [];
     if (fileUploadInfo) {
       fileUploadInfo.url = this.minioUtils.getUrl(fileUploadInfo.objectName);
+      eTags = await this.minioUtils.getListParts(
+        fileUploadInfo.objectName,
+        fileUploadInfo.uploadId,
+      );
     }
 
     eTags.sort((a, b) => a.part - b.part);
@@ -167,5 +164,9 @@ export class AppService {
 
   getList() {
     return this.uploadFileService.getList();
+  }
+
+  listPart(objectName: string, uploadId: string) {
+    return this.minioUtils.getListParts(objectName, uploadId);
   }
 }
